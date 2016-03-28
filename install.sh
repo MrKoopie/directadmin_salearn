@@ -42,14 +42,14 @@ install_cron()
 		mkdir -p /scripts/mrkoopie/cron/;
 	fi
 
-	if [ -f x/scripts/cron/mrkoopie/learn_spamassassin.sh ]
+	if [ -f /scripts/cron/mrkoopie/learn_spamassassin.sh ]
 	then
 		echo "WARNING!!! /scripts/mrkoopie/cron/learn_spamassassin.sh EXISTS!! CHECK THE README AND INSTALL THE CRON MANUALLY!!";
 	else
 
 		# Install the cron
 		cp cron/learn_spamassassin.sh /scripts/mrkoopie/cron/learn_spamassassin.sh
-		chmod 700 /scripts/cron/learn_spamassassin.sh
+		chmod 700 /scripts/cron/mrkoopie/learn_spamassassin.sh
 		echo "1 12 * * * /scripts/cron/mrkoopie/learn_spamassassin.sh > /dev/null 2>&1"
 		service crond restart
 
