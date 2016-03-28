@@ -50,7 +50,7 @@ install_cron()
 		# Install the cron
 		cp cron/learn_spamassassin.sh /scripts/mrkoopie/cron/learn_spamassassin.sh
 		chmod 700 /scripts/mrkoopie/cron/learn_spamassassin.sh
-		echo "1 12 * * * /scripts/mrkoopie/cron/learn_spamassassin.sh > /dev/null 2>&1"
+		echo "1 12 * * * /scripts/mrkoopie/cron/learn_spamassassin.sh" >> /var/spool/cron/root
 		service crond restart
 
 		echo "Installed /scripts/mrkoopie/cron/learn_spamassassin.sh"
