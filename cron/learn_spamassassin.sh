@@ -44,6 +44,31 @@ sync_teachspamfolder_for_email_accounts_in_domain()
 	done;
 }
 
+check_if_maildir_is_empty()
+{
+	directory=${1};
+
+	if [ DELETE_TEACH_DATA == 0 ]
+	then
+		folder_status="not_empty";
+	fi
+
+	if [ -d "$directory/cur" ] || [ -d "$directory/new" ];
+	then
+		echo "Found cur and/or new, check if a file exists"
+		if [ "$(ls -A $directory/cur 2> /dev/null)" == '' ] && [ "$(ls -A $directory/new 2> /dev/null)" == '' ];
+		then
+			echo "Empty"
+			folder_status="empty";
+		else
+			echo "not empty"
+			folder_status="not_empty";
+		fi
+	else
+		folder_status="empty";
+	fi
+}
+
 sync_teach_folders()
 {
 	maildir=${1};
@@ -51,31 +76,43 @@ sync_teach_folders()
 	teach_ispamfolder="$maildir/.INBOX.teach-isspam";
 	teach_isnotspam="$maildir/.INBOX.teach-isnotspam";
 
+	echo "RUNNING FOR $maildir AND USER $user"
+
 	if [ -d $maildir ];
 	then
 		if [ -d  $teach_ispamfolder ];
 		then
-			# Sync the folder
-			echo "Learning spam"
-			sa-learn --no-sync --spam  $teach_ispamfolder/{cur,new}
+			check_if_maildir_is_empty $teach_ispamfolder;
 
-			# Remove the messages
-			if [ "$DELETE_TEACH_DATA" -eq 1 ]; then
-				echo "deleting"
-				rm -rf "$teach_ispamfolder/*";
-			fi;
+			if [ $folder_status == "not_empty" ]
+			then
+				# Sync the folder
+				echo "Learning spam"
+				sa-learn --no-sync --spam  $teach_ispamfolder/{cur,new}
+
+				# Remove the messages
+				if [ "$DELETE_TEACH_DATA" -eq 1 ]; then
+					echo "deleting $teach_ispamfolder/*"
+					`rm -rf $teach_ispamfolder/*`
+				fi;
+			fi
 		fi
 
-		if [ ! -d $teach_isnotspam ];
+		if [ -d $teach_isnotspam ];
 		then
-			# Sync the folder
-			echo "Learning nospam"
-			sa-learn --no-sync --ham $teach_isnotspam/{cur,new}
+			check_if_maildir_is_empty $teach_isnotspam;
 
-			# Remove the messages
-		 	if [ "$DELETE_TEACH_DATA" -eq 1 ]; then
-		 		echo "deleting"
-				rm -rf "$teach_isnotspam/*";
+			if [ $folder_status == "not_empty" ]
+			then
+				# Sync the folder
+				echo "Learning nospam"
+				sa-learn --no-sync --ham $teach_isnotspam/{cur,new}
+
+				# Remove the messages
+			 	if [ "$DELETE_TEACH_DATA" -eq 1 ]; then
+			 		echo "deleting $teach_isnotspam/*"
+					`rm -rf $teach_isnotspam/*`
+				fi;
 			fi;
 		fi
 
