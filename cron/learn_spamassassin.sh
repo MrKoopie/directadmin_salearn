@@ -48,7 +48,7 @@ check_if_maildir_is_empty()
 {
 	directory=${1};
 
-	if [ DELETE_TEACH_DATA == 0 ]
+	if [ $DELETE_TEACH_DATA == 0 ]
 	then
 		folder_status="not_empty";
 	fi
