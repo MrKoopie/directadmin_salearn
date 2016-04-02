@@ -26,7 +26,7 @@ create_teachspam_folder_for_every_domain_of_user()
 	for domain in `cat /usr/local/directadmin/data/users/$user/domains.list`
 	do
 		echo "Working on domain $domain"
-		create_teachspamfolder_for_email_accounts_in_domain $domain;
+		create_teachspamfolder_for_email_accounts_in_domain $domain $user;
 		echo ${domain};
 	done
 }
@@ -34,6 +34,7 @@ create_teachspam_folder_for_every_domain_of_user()
 create_teachspamfolder_for_email_accounts_in_domain()
 {
 	domain=${1};
+	user=${2};
 
 	for raw_account_data in `cat /etc/virtual/$domain/passwd`;
 	do
@@ -41,7 +42,7 @@ create_teachspamfolder_for_email_accounts_in_domain()
 		maildir="`echo $raw_account_data | cut -d ':'  -f6`/Maildir";
 
 		echo "Working on email box $emailbox_name@$domain"
-		create_teach_folders $maildir;
+		create_teach_folders $maildir $user;
 	done;
 }
 
